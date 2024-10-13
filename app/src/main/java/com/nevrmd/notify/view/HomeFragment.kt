@@ -1,17 +1,17 @@
 package com.nevrmd.notify.view
 
 import android.os.Bundle
-import com.nevrmd.notify.model.Note
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import com.nevrmd.notify.R
 import com.nevrmd.notify.adapter.NoteAdapter
 import com.nevrmd.notify.databinding.FragmentHomeBinding
+import com.nevrmd.notify.model.Note
 import com.nevrmd.notify.persistence.NoteDatabase
 import com.nevrmd.notify.persistence.NoteRepository
 import com.nevrmd.notify.viewmodel.MainViewModel
@@ -34,11 +34,7 @@ class HomeFragment : Fragment() {
         val factory = MainViewModelFactory(repository)
         mainViewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         initRecyclerView()
-
-        binding.fabAdd.setOnClickListener {
-            loadFragment(NoteFragment())
-        }
-
+        binding.fabAdd.setOnClickListener { navigateToNoteFragment() }
         return binding.root
     }
 
@@ -48,27 +44,23 @@ class HomeFragment : Fragment() {
     }
 
     private fun displayNotesList() {
-        mainViewModel.notes.observe(viewLifecycleOwner, Observer {
-            binding.rvNotes.adapter = NoteAdapter(
-                it
-            ) { selectedItem: Note -> noteCLicked(selectedItem) }
-        })
+        mainViewModel.notes.observe(viewLifecycleOwner) { list ->
+            binding.rvNotes.adapter = NoteAdapter(list) {
+                selectedItem: Note -> noteCLicked(selectedItem)
+            }
+        }
     }
 
     private fun noteCLicked(selectedItem: Note) {
-        mainViewModel.initNoteEdit(selectedItem)
-        TODO()
+        navigateToNoteFragment() // тут нужно передать параметры через safe args, чтобы редактировать note
+    }
+
+    private fun navigateToNoteFragment() {
+        Navigation.findNavController(binding.root).navigate(R.id.navigateToNoteFragment)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun loadFragment(fragment: Fragment){
-        val transaction = activity?.supportFragmentManager?.beginTransaction()
-        transaction?.replace(R.id.fragmentContainerView, fragment)
-        transaction?.disallowAddToBackStack()
-        transaction?.commit()
     }
 }

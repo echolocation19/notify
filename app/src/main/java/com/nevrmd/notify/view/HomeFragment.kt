@@ -52,7 +52,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun noteCLicked(selectedItem: Note) {
-        navigateToNoteFragment() // тут нужно передать параметры через safe args, чтобы редактировать note
+        navigateToNoteFragmentWithArgs(selectedItem) // тут нужно передать параметры через safe args, чтобы редактировать note
+    }
+
+    private fun navigateToNoteFragmentWithArgs(selectedItem: Note) {
+        val id = selectedItem.id
+        val title = selectedItem.title
+        val body = selectedItem.body
+        val action = HomeFragmentDirections.navigateToNoteFragment(title, body, id)
+        Navigation.findNavController(binding.root).navigate(action)
     }
 
     private fun navigateToNoteFragment() {

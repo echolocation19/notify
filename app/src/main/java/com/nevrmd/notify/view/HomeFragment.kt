@@ -52,7 +52,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun noteCLicked(selectedItem: Note) {
-        navigateToNoteFragmentWithArgs(selectedItem) // тут нужно передать параметры через safe args, чтобы редактировать note
+        navigateToNoteFragmentWithArgs(selectedItem)
     }
 
     private fun navigateToNoteFragmentWithArgs(selectedItem: Note) {

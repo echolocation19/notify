@@ -22,7 +22,7 @@ class NoteFragment : Fragment() {
     private var _binding: FragmentNoteBinding? = null
     private val binding get() = _binding!!
 
-    val args: NoteFragmentArgs by navArgs()
+    private val args: NoteFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,

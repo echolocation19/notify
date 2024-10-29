@@ -22,6 +22,7 @@ class NoteAdapter(
             tvTitle.text = currentItem.title
             tvBody.text = currentItem.body
             binding.root.setOnClickListener { listener.onClick(currentItem) }
+            binding.root.setOnLongClickListener { listener.onLongClick(currentItem); true }
         }
     }
 
@@ -33,7 +34,8 @@ class NoteAdapter(
     }
 }
 
-fun interface OnNoteClickListener {
+interface OnNoteClickListener {
 
     fun onClick(note: NoteEntity)
+    fun onLongClick(note: NoteEntity)
 }

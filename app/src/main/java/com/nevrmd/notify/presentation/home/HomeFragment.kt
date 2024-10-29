@@ -1,7 +1,10 @@
 package com.nevrmd.notify.presentation.home
 
 import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import com.nevrmd.notify.R
@@ -12,6 +15,7 @@ import com.nevrmd.notify.domain.NoteEntity
 import com.nevrmd.notify.presentation.BaseFragment
 import com.nevrmd.notify.presentation.ViewModelFactory
 import com.nevrmd.notify.presentation.note.NoteAdapter
+import com.nevrmd.notify.presentation.note.OnNoteClickListener
 
 class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(
     viewModelClass = HomeViewModel::class.java
@@ -36,14 +40,24 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(
     private fun FragmentHomeBinding.initRecyclerView() = with(rvNotes) {
         layoutManager = GridLayoutManager(requireContext(), GRID_LAYOUT_SPAN_COUNT)
         viewModel.getNotes().observe(viewLifecycleOwner) { list ->
-            adapter = NoteAdapter(list) { selectedItem: NoteEntity ->
-                noteCLicked(selectedItem)
-            }
+            adapter = NoteAdapter(list, object : OnNoteClickListener {
+                override fun onClick(selectedItem: NoteEntity) {
+                    noteClicked(selectedItem)
+                }
+
+                override fun onLongClick(selectedItem: NoteEntity) {
+                    noteLongClicked(selectedItem)
+                }
+            })
         }
     }
 
-    private fun noteCLicked(selectedItem: NoteEntity) {
+    private fun noteClicked(selectedItem: NoteEntity) {
         navigateToNoteFragmentWithArgs(selectedItem)
+    }
+
+    private fun noteLongClicked(selectedItem: NoteEntity) {
+        showDeletePopup(requireView(), selectedItem)
     }
 
     private fun navigateToNoteFragmentWithArgs(selectedItem: NoteEntity) {
@@ -56,6 +70,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(
 
     private fun navigateToNoteFragment() {
         Navigation.findNavController(binding.root).navigate(R.id.navigateToNoteFragment)
+    }
+
+    private fun showDeletePopup(view: View, selectedItem: NoteEntity) {
+        val popupMenu = PopupMenu(requireContext(), view)
+        popupMenu.inflate(R.menu.header_menu)
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.hDelete -> {
+                    deleteNote(selectedItem)
+                    true
+                }
+                else -> false
+            }
+        }
+        popupMenu.show()
+    }
+
+    private fun deleteNote(selectedItem: NoteEntity) {
+        viewModel.delete(selectedItem)
     }
 
     private companion object {

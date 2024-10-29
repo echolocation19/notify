@@ -18,7 +18,7 @@ class NoteFragment : BaseFragment<FragmentNoteBinding, NoteViewModel>(
     viewModelClass = NoteViewModel::class.java,
 ) {
 
-    val args: NoteFragmentArgs by navArgs()
+    private val args: NoteFragmentArgs by navArgs()
 
     override fun createViewModelFactory(): ViewModelProvider.Factory {
         val dao = NoteDatabase.getInstance(requireContext()).noteDao

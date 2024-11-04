@@ -40,15 +40,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(
     private fun FragmentHomeBinding.initRecyclerView() = with(rvNotes) {
         layoutManager = GridLayoutManager(requireContext(), GRID_LAYOUT_SPAN_COUNT)
         viewModel.getNotes().observe(viewLifecycleOwner) { list ->
-            adapter = NoteAdapter(list, object : OnNoteClickListener {
-                override fun onClick(selectedItem: NoteEntity) {
-                    noteClicked(selectedItem)
-                }
-
-                override fun onLongClick(selectedItem: NoteEntity) {
-                    noteLongClicked(selectedItem)
-                }
-            })
+            adapter = NoteAdapter(
+                list,
+                { selectedItem -> noteClicked(selectedItem) },
+                { selectedItem, position ->
+                    // find view by position in rv
+                    val view = binding.rvNotes.findViewHolderForAdapterPosition(position)?.itemView
+                        ?: return@NoteAdapter
+                    noteLongClicked(selectedItem, view)
+                })
         }
     }
 
@@ -56,8 +56,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(
         navigateToNoteFragmentWithArgs(selectedItem)
     }
 
-    private fun noteLongClicked(selectedItem: NoteEntity) {
-        showDeletePopup(requireView(), selectedItem)
+    private fun noteLongClicked(selectedItem: NoteEntity, itemView: View) {
+        showDeletePopup(itemView, selectedItem)
     }
 
     private fun navigateToNoteFragmentWithArgs(selectedItem: NoteEntity) {
@@ -81,6 +81,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(
                     deleteNote(selectedItem)
                     true
                 }
+
                 else -> false
             }
         }

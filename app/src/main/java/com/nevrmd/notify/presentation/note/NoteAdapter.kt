@@ -10,6 +10,7 @@ import com.nevrmd.notify.domain.NoteEntity
 class NoteAdapter(
     private val noteList: List<NoteEntity>,
     private val listener: OnNoteClickListener,
+    private val longClickListener: OnNoteLongClickListener,
 ) : RecyclerView.Adapter<NoteAdapter.ViewHolderClass>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderClass {
         val binding = NoteItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -22,7 +23,7 @@ class NoteAdapter(
             tvTitle.text = currentItem.title
             tvBody.text = currentItem.body
             binding.root.setOnClickListener { listener.onClick(currentItem) }
-            binding.root.setOnLongClickListener { listener.onLongClick(currentItem); true }
+            binding.root.setOnLongClickListener { longClickListener.onLongClick(currentItem, position); true }
         }
     }
 
@@ -34,8 +35,12 @@ class NoteAdapter(
     }
 }
 
-interface OnNoteClickListener {
+fun interface OnNoteClickListener {
 
     fun onClick(note: NoteEntity)
-    fun onLongClick(note: NoteEntity)
+}
+
+fun interface OnNoteLongClickListener {
+
+    fun onLongClick(note: NoteEntity, position: Int)
 }
